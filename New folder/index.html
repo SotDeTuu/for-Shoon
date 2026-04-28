@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Letter for You 💙</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b3e5fc 50%, #81d4fa 100%);
+            font-family: 'Georgia', serif;
+            overflow: hidden;
+        }
+
+        /* Floating hearts background */
+        .hearts-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .heart {
+            position: absolute;
+            color: rgba(255, 182, 193, 0.6);
+            font-size: 20px;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Envelope container */
+        .envelope-container {
+            position: relative;
+            width: 90%;
+            max-width: 500px;
+            aspect-ratio: 1.4 / 1;
+            cursor: pointer;
+            z-index: 1;
+            perspective: 1000px;
+        }
+
+        .envelope {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s ease;
+        }
+
+        .envelope.open {
+            transform: rotateX(30deg);
+        }
+
+        /* Envelope body */
+        .envelope-body {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #ffffff 0%, #f0f8ff 100%);
+            border-radius: 20px;
+            box-shadow: 
+                0 10px 40px rgba(0, 100, 200, 0.2),
+                inset 0 2px 10px rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+        }
+
+        /* Envelope flap */
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(180deg, #e1f5fe 0%, #b3e5fc 100%);
+            clip-path: polygon(0 0, 50% 100%, 100% 0);
+            transform-origin: top center;
+            transition: transform 0.6s ease 0.3s;
+            z-index: 3;
+            box-shadow: 0 2px 10px rgba(0, 100, 200, 0.1);
+        }
+
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        /* Letter inside */
+        .letter {
+            position: absolute;
+            top: 8%;
+            left: 8%;
+            width: 84%;
+            height: 70%;
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            transform: translateY(20px) scale(0.9);
+            opacity: 0;
+            transition: all 0.6s ease 0.5s;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            z-index: 2;
+        }
+
+        .envelope.open .letter {
+            transform: translateY(-30px) scale(1);
+            opacity: 1;
+        }
+
+        .letter-content {
+            text-align: center;
+            color: #4a6fa5;
+            line-height: 1.8;
+        }
+
+        .letter-content h1 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #2196f3;
+        }
+
+        .letter-content p {
+            font-size: 1rem;
+            white-space: pre-wrap;
+        }
+
+        /* Heart seal */
+        .seal {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff8a80 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+            z-index: 4;
+            transition: transform 0.3s ease;
+        }
+
+        .envelope-container:hover .seal {
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .envelope.open .seal {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Instruction text */
+        .instruction {
+            position: absolute;
+            bottom: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #5c9cc7;
+            font-size: 0.9rem;
+            text-align: center;
+            white-space: nowrap;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        /* Mobile adjustments */
+        @media (max-width: 480px) {
+            .envelope-container {
+                width: 85%;
+            }
+
+            .letter {
+                padding: 15px;
+            }
+
+            .letter-content h1 {
+                font-size: 1.2rem;
+            }
+
+            .letter-content p {
+                font-size: 0.9rem;
+            }
+
+            .seal {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating hearts background -->
+    <div class="hearts-bg" id="heartsBg"></div>
+
+    <!-- Envelope -->
+    <div class="envelope-container" onclick="openEnvelope()">
+        <div class="envelope" id="envelope">
+            <div class="envelope-flap"></div>
+            <div class="envelope-body"></div>
+            <div class="letter">
+                <div class="letter-content">
+                    <h1>Dear [Shoon Lei San], 💙</h1>
+                    <p id="loveLetter">ရွှန်းးလေး ရွှန်းကိုကိုယ်ချစ်တယ်❤️
+
+ဘယ်လောက်ထိချစ်လဲဆို 
+ရွှန်းအကြောင်းတွေးရင်ပျော်လာတာတယ် ရင်ထဲကလိကလိဖြစ်ပြီးကြည်နူးတယ်
+မနက်ခင်းတစ်ခုကိုလဲရွှန်းဆီကစကားသံလေးကြားမှကိုယ်တစ်နေပျော်ရွှင်နိုင်တယ်
+ညဆိုလဲရွှန်းဆီက နှုတ်ဆက်စကားလေးကြားမှသေချာအိပ်ပျော်တယ်ရွှန်း
+တစ်ခုခုဆိုရွှန်းကိုပဲမြင်နေတာမျိုးပေါ့ရွှန်းရယ်။
+ဒါပေမဲ့ဒီတိုင်းချစ်နေရုံနဲ့မရဘူးဆိုတာကိုယ်သဘောပေါက်သွားပါပြီ
+
+အဲ့တော့ရွှန်းနဲ့ကိုယ် တွဲချင်တယ်
+ကိုယ့်ရဲ့ Partner အ‌ဖြစ်ရွှန်းကိုရှိစေချင်တယ်ရွှန်း
+ရွှန်းနဲ့အတူအချိန်တွေကုန်ဆုံးချင်တယ် 
+ရွှန်းနဲ့ပျော်ရွှင်စရာနေ့တွေ‌ကိုကြည်ကြည်နူးနူးခံစားပြီး ဆိုးရွားတဲ့နေ့တွေကိုတူတူကျော်ဖြတ်ချင်တယ်
+ရွှန်းကိုရွှန်းလို့နောင်နှစ်တွေအကြာရီးခေါ်ချင်တယ်ရွှန်း
+ရွှန်းအတွက်ကောင်လေးကောင်းအဖြစ်ကိုယ်ရှိနေပါ့မယ်
+ရွှန်းကိုလဲကိုယ်သေချာဂရုစိုက်မယ်းရွှန်းး
+ရွန်းလက်ခံမယ်ဆိုရင် ကိုယ်ရွှန်းကိုရော ကိုယ့်ကိုယ်ကိုရောပိုဂရုစိုက်ပါမယ်းရွှန်းး 
+အဲ့တော့..
+
+Can you be my girlfriend Ssy?</p>
+                </div>
+            </div>
+            <div class="seal">💌</div>
+        </div>
+    </div>
+    <div class="instruction">Tap to open ✨</div>
+
+    <script>
+        // Create floating hearts
+        function createHearts() {
+            const heartsBg = document.getElementById('heartsBg');
+            const heartCount = 15;
+
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '💕';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 6 + 's';
+                heart.style.animationDuration = (4 + Math.random() * 4) + 's';
+                heartsBg.appendChild(heart);
+            }
+        }
+
+        // Open envelope
+        let isOpen = false;
+        function openEnvelope() {
+            const envelope = document.getElementById('envelope');
+            const instruction = document.querySelector('.instruction');
+            
+            if (!isOpen) {
+                envelope.classList.add('open');
+                instruction.style.opacity = '0';
+                isOpen = true;
+            }
+        }
+
+        // Initialize
+        createHearts();
+    </script>
+</body>
+</html>
